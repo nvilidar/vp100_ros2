@@ -35,8 +35,7 @@ add_executable(vp100_ros2_node
     sdk/src/impl/src/serial/nvilidar_serial_unix.cpp
     sdk/src/impl/src/serial/nvilidar_serial_win.cpp
     sdk/src/nvilidar/nvilidar_driver_serialport.cpp
-    sdk/src/nvilidar/nvilidar_process.cpp
-    sdk/src/nvilidar/nvilidar_filter.cpp) 
+    sdk/src/nvilidar/nvilidar_process.cpp) 
 #---------------------------------------------------------------------------------------
 # link libraries
 #--------------------------------------------------------------------------------------
@@ -56,8 +55,7 @@ add_executable(vp100_ros2_client
     sdk/src/impl/src/serial/nvilidar_serial_unix.cpp
     sdk/src/impl/src/serial/nvilidar_serial_win.cpp
     sdk/src/nvilidar/nvilidar_driver_serialport.cpp
-    sdk/src/nvilidar/nvilidar_process.cpp
-    sdk/src/nvilidar/nvilidar_filter.cpp)
+    sdk/src/nvilidar/nvilidar_process.cpp)
 #---------------------------------------------------------------------------------------
 # link libraries
 #--------------------------------------------------------------------------------------

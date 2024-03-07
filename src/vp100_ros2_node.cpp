@@ -16,7 +16,7 @@
 #include "nvilidar_process.h"
 
 //version 
-#define ROS2Verision "1.0.0"
+#define ROS2Verision "1.0.2"
 
 //define
 #define READ_PARAM(TYPE, NAME, VAR, VALUE) VAR = VALUE; \
@@ -58,18 +58,7 @@ int main(int argc,char *argv[])
 	READ_PARAM(bool, "angle_offset_change_flag", (cfg.angle_offset_change_flag), false);
     READ_PARAM(double, "angle_offset", (cfg.angle_offset), 0.0);
     READ_PARAM(std::string, "ignore_array_string", (cfg.ignore_array_string), "");
-	//filter 
-	READ_PARAM(bool, "filter_sliding_enable", (cfg.filter_para.sliding_filter.enable), true);
-    READ_PARAM(bool, "filter_tail_enable", (cfg.filter_para.tail_filter.enable), true);
-	READ_PARAM(int, "filter_sliding_jump_threshold", (cfg.filter_para.sliding_filter.jump_threshold), 50);
-	READ_PARAM(bool, "filter_sliding_max_range_flag", (cfg.filter_para.sliding_filter.max_range_flag), false);
-    READ_PARAM(int, "filter_sliding_max_range", (cfg.filter_para.sliding_filter.max_range), 8000);
-    READ_PARAM(int, "filter_sliding_window", (cfg.filter_para.sliding_filter.window), 3);
-    READ_PARAM(bool, "filter_tail_distance_limit_flag", (cfg.filter_para.tail_filter.distance_limit_flag), false);
-    READ_PARAM(int, "filter_tail_distance_limit_value", (cfg.filter_para.tail_filter.distance_limit_value), 8000);
-    READ_PARAM(int, "filter_tail_level", (cfg.filter_para.tail_filter.level), 8);
-    READ_PARAM(int, "filter_tail_neighbors", (cfg.filter_para.tail_filter.neighbors), 0);
-
+    
     //choice use serialport
     vp100_lidar::LidarProcess laser(cfg.serialport_name,cfg.serialport_baud);
 

@@ -230,7 +230,7 @@ format(const char* format, ...)
 {
     va_list ap;
 
-    int buffer_size_bytes = 256;
+    size_t buffer_size_bytes = 256;
 
     string result;
 

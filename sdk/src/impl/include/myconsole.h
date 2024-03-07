@@ -133,6 +133,6 @@ public:
 
 static Console console;
 
-}
+};
 
 #endif /* _CONSOLE_H_ */
