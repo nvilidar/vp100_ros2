@@ -14,14 +14,22 @@
 #include <cmath>
 
 #include "nvilidar_process.h"
+#include "mytimer.hpp"
 
 //version 
-#define ROS2Verision "1.0.2"
+#define ROS2Verision "1.0.3"
 
 //define
 #define READ_PARAM(TYPE, NAME, VAR, VALUE) VAR = VALUE; \
        	node->declare_parameter<TYPE>(NAME, VAR); \
        	node->get_parameter(NAME, VAR);
+
+//get stamp 
+uint64_t  get_stamp_callback(){
+    uint64_t current_time = 0;
+    current_time = rclcpp::Clock().now().nanoseconds();
+    return current_time;
+}
 
 int main(int argc,char *argv[])
 {
@@ -58,9 +66,10 @@ int main(int argc,char *argv[])
 	READ_PARAM(bool, "angle_offset_change_flag", (cfg.angle_offset_change_flag), false);
     READ_PARAM(double, "angle_offset", (cfg.angle_offset), 0.0);
     READ_PARAM(std::string, "ignore_array_string", (cfg.ignore_array_string), "");
+    READ_PARAM(bool, "log_enable_flag", (cfg.log_enable_flag), true);
     
     //choice use serialport
-    vp100_lidar::LidarProcess laser(cfg.serialport_name,cfg.serialport_baud);
+    vp100_lidar::LidarProcess laser(cfg.serialport_name,cfg.serialport_baud,get_stamp_callback,1e9);
 
     //reload lidar parameter 
     laser.LidarReloadPara(cfg); 
@@ -98,8 +107,8 @@ int main(int argc,char *argv[])
 					auto scan_msg = std::make_shared<sensor_msgs::msg::LaserScan>();
                     size_t avaliable_count = 0;
 
-					scan_msg->header.stamp.sec = RCL_NS_TO_S(scan.stamp);
-					scan_msg->header.stamp.nanosec =  scan.stamp - RCL_S_TO_NS(scan_msg->header.stamp.sec);
+					scan_msg->header.stamp.sec = RCL_NS_TO_S(scan.stamp_start);
+					scan_msg->header.stamp.nanosec =  scan.stamp_start - RCL_S_TO_NS(scan_msg->header.stamp.sec);
 					scan_msg->header.frame_id = cfg.frame_id;
 					scan_msg->angle_min = scan.config.min_angle;
 					scan_msg->angle_max = scan.config.max_angle;

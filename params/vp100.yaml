@@ -1,7 +1,7 @@
 vp100_ros2_node:
   ros__parameters:
     serialport_name: "/dev/nvilidar"
-    serialport_baud: 115200
+    serialport_baud: 230400
     frame_id: "laser_frame"
     resolution_fixed: false
     auto_reconnect: true
@@ -16,3 +16,4 @@ vp100_ros2_node:
     angle_offset_change_flag: false
     angle_offset: 0.0
     ignore_array_string: ""
+    log_enable_flag: true

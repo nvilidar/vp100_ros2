@@ -25,6 +25,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_SOURCE_DIR}/sdk/src/impl/include
   ${PROJECT_SOURCE_DIR}/sdk/src/nvilidar
+  ${PROJECT_SOURCE_DIR}/sdk/src/3rdparty
   )
 
 #---------------------------------------------------------------------------------------
@@ -34,6 +35,7 @@ add_executable(vp100_ros2_node
     src/vp100_ros2_node.cpp
     sdk/src/impl/src/serial/nvilidar_serial_unix.cpp
     sdk/src/impl/src/serial/nvilidar_serial_win.cpp
+    sdk/src/nvilidar/nvilidar_log.cpp
     sdk/src/nvilidar/nvilidar_driver_serialport.cpp
     sdk/src/nvilidar/nvilidar_process.cpp) 
 #---------------------------------------------------------------------------------------
@@ -54,6 +56,7 @@ add_executable(vp100_ros2_client
     src/vp100_ros2_client.cpp
     sdk/src/impl/src/serial/nvilidar_serial_unix.cpp
     sdk/src/impl/src/serial/nvilidar_serial_win.cpp
+    sdk/src/nvilidar/nvilidar_log.cpp
     sdk/src/nvilidar/nvilidar_driver_serialport.cpp
     sdk/src/nvilidar/nvilidar_process.cpp)
 #---------------------------------------------------------------------------------------

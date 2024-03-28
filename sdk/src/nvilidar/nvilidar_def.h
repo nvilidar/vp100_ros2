@@ -9,7 +9,7 @@
 //======================================basic parameter============================================ 
 
 //SDK version 
-#define NVILIDAR_SDKVerision     "1.0.2"
+#define NVILIDAR_SDKVerision     "1.0.3"
 
 //PI def
 #ifndef M_PI
@@ -30,6 +30,13 @@ typedef enum
    	NVILIDAR_Tail,
 }LidarModelListEnumTypeDef;
 
+//lidar error flag 
+typedef enum{
+	VP100_ERROR_CODE_RESET = 0,			//lidar reset...
+	VP100_ERROR_CODE_MOTOR_LOCK  = 1,	//motor not run 
+	VP100_ERROR_CODE_UP_NO_POINT = 2,	//upboard no data 
+	VP100_ERROR_CODE_NORMAL = 0xFF,		//normal 
+}VP100Lidar_ErrorFlagEnumTypeDef;
 
 //======================================other parameters============================================ 
 
@@ -37,14 +44,13 @@ typedef enum
 typedef struct
 {
 	bool m_CommOpen;              	//serialport open flag 
+	//bool m_Scanning;                //lidar is scanning data 
 	uint8_t last_device_byte;       //last byte 
 }Nvilidar_PackageStateTypeDef;
 
 //lidar configure para
 typedef struct
 {
-	LidarModelListEnumTypeDef  lidar_model_name;	//lidar model name 
-
 	std::string frame_id;				//ID
 	std::string serialport_name;		//serialport name 
 	int    		serialport_baud;		//serialport baudrate 
@@ -63,7 +69,9 @@ typedef struct
 	std::string ignore_array_string;	//filter angle ,string,like ,
 	std::vector<float> ignore_array;	//filter angle to array list 
 
-	bool 		resolution_fixed;		//is good resolution   
+	bool 		resolution_fixed;		//is good resolution  
+
+	bool 		log_enable_flag;		//is use the log?
 }Nvilidar_UserConfigTypeDef;
 
 //lidar point 
@@ -79,8 +87,11 @@ typedef struct
 {
 	uint64_t  startStamp;			//One Lap Start Timestamp 
 	uint64_t  stopStamp;			//One Lap Stop Timestamp 
+	uint64_t  differStamp;	  		//differ Timestamp
 	std::vector<Nvilidar_Node_Info>  lidarCircleNodePoints;	//lidar point data
+	VP100Lidar_ErrorFlagEnumTypeDef  error_code;			//error code 
 }CircleDataInfoTypeDef;
+
 
 
 //======================================Output data information============================================ 
@@ -96,6 +107,8 @@ typedef struct {
 	float range;
 	/// lidar intensity
 	float intensity;
+	/// stamp 
+	uint64_t stamp;
 } NviLidarPoint;
 
 /**
@@ -123,14 +136,17 @@ typedef struct {
 
 
 typedef struct {
-	/// System time when first range was measured in nanoseconds
-	uint64_t stamp;
-	/// Array of lidar points
+	// System time when first range was measured in nanoseconds
+	uint64_t stamp_start;
+	uint64_t stamp_stop;
+	uint64_t stamp_differ;
+	// Array of lidar points
 	std::vector<NviLidarPoint> points;
-	/// Configuration of scan
-	NviLidarConfig config;
+	// Configuration of scan
+	NviLidarConfig config;	
+	// error code 
+	VP100Lidar_ErrorFlagEnumTypeDef  error_code;
 } LidarScan;
-
 
 
 #endif
