@@ -125,8 +125,8 @@ int main(int argc,char *argv[])
 					scan_msg->intensities.resize(size);
                 	avaliable_count = 0;
 					for(size_t i=0; i < scan.points.size(); i++) {
-						int index = std::ceil((scan.points[i].angle - scan.config.min_angle)/scan.config.angle_increment);
-						if(index >=0 && index < size) 
+						size_t index = std::ceil((scan.points[i].angle - scan.config.min_angle)/scan.config.angle_increment);
+						if(index < size) 
 						{
                         	avaliable_count++;
 
