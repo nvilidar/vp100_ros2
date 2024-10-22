@@ -1,16 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
-project(vp100_ros2 C CXX)
+project(lidar_ros2)
 
-##################ros2#############################################
-# Default to C++14
+# set base info
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
+endif()
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-####################find package#####################################
+#find package 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rmw REQUIRED)
@@ -19,70 +22,53 @@ find_package(visualization_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 
-#Include directories
+# add include 
 include_directories(
-  ${PROJECT_SOURCE_DIR}
-  ${PROJECT_SOURCE_DIR}/src
-  ${PROJECT_SOURCE_DIR}/sdk/src/impl/include
-  ${PROJECT_SOURCE_DIR}/sdk/src/nvilidar
-  ${PROJECT_SOURCE_DIR}/sdk/src/3rdparty
-  )
+  ${catkin_INCLUDE_DIRS}
+  sdk/include
+  ros2/include
+)
 
-#---------------------------------------------------------------------------------------
-# generate excutable and add libraries
-#---------------------------------------------------------------------------------------
-add_executable(vp100_ros2_node
-    src/vp100_ros2_node.cpp
-    sdk/src/impl/src/serial/nvilidar_serial_unix.cpp
-    sdk/src/impl/src/serial/nvilidar_serial_win.cpp
-    sdk/src/nvilidar/nvilidar_log.cpp
-    sdk/src/nvilidar/nvilidar_driver_serialport.cpp
-    sdk/src/nvilidar/nvilidar_process.cpp) 
-#---------------------------------------------------------------------------------------
-# link libraries
-#--------------------------------------------------------------------------------------
-ament_target_dependencies(${PROJECT_NAME}_node
-    "rclcpp"
-    "sensor_msgs"
-    "visualization_msgs"
-    "geometry_msgs"
-    "std_srvs"
-    )
+# add src
+FILE(GLOB LIDAR_SDK_SRC 
+  "sdk/src/lidar/lidar_protocol.cpp"
+  "sdk/src/lidar.cpp"
+  "sdk/src/interface/console/interface_console.cpp"
+)
+if(WIN32)  
+  list(APPEND LIDAR_SDK_SRC "sdk/src/interface/serial/win/interface_serial.cpp")  
+elseif(UNIX)  
+  list(APPEND LIDAR_SDK_SRC "sdk/src/interface/serial/unix/interface_serial.cpp")  
+endif()
 
-#---------------------------------------------------------------------------------------
-# generate excutable and add libraries
-#---------------------------------------------------------------------------------------
-add_executable(vp100_ros2_client
-    src/vp100_ros2_client.cpp
-    sdk/src/impl/src/serial/nvilidar_serial_unix.cpp
-    sdk/src/impl/src/serial/nvilidar_serial_win.cpp
-    sdk/src/nvilidar/nvilidar_log.cpp
-    sdk/src/nvilidar/nvilidar_driver_serialport.cpp
-    sdk/src/nvilidar/nvilidar_process.cpp)
-#---------------------------------------------------------------------------------------
-# link libraries
-#--------------------------------------------------------------------------------------
-ament_target_dependencies(${PROJECT_NAME}_client
-    "rclcpp"
-    "sensor_msgs"
-    "visualization_msgs"
-    "geometry_msgs"
-    "std_srvs"
-    )
+#link client
+add_executable(lidar_ros2_client ros2/src/ros2_client.cpp)
+ament_target_dependencies(lidar_ros2_client
+  "rclcpp"
+  "sensor_msgs"
+  "visualization_msgs"
+  "geometry_msgs"
+  "std_srvs"
+)
 
-#---------------------------------------------------------------------------------------
-# Install
-#---------------------------------------------------------------------------------------
-install(TARGETS
-    vp100_ros2_node vp100_ros2_client
-    DESTINATION lib/${PROJECT_NAME})
+#link node 
+add_executable(lidar_ros2_node ros2/src/ros2_node.cpp  ros2/src/ros2_convert.cpp ${LIDAR_SDK_SRC})
+ament_target_dependencies(lidar_ros2_node
+  "rclcpp"
+  "sensor_msgs"
+  "visualization_msgs"
+  "geometry_msgs"
+  "std_srvs"
+)
 
-install(DIRECTORY launch params startup
-    DESTINATION share/${PROJECT_NAME})
-
+#install
+install(TARGETS lidar_ros2_node lidar_ros2_client
+        DESTINATION lib/${PROJECT_NAME})
+install(DIRECTORY launch params rules rviz
+        DESTINATION share/${PROJECT_NAME})
 if(BUILD_TESTING)
-    find_package(ament_lint_auto REQUIRED)
-    ament_lint_auto_find_test_dependencies()
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_package()

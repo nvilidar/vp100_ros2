@@ -1,0 +1,12 @@
+lidar_ros2_node:
+  ros__parameters:
+    serial_name: "/dev/ttyUSB0"
+    serial_baud: 230400
+    frame_id: "laser_frame"
+    counterclockwise: true
+    angle_min: -180.0
+    angle_max: 180.0
+    range_min: 0.001
+    range_max: 15.0
+    resolution_fixed: false
+    angle_corp_string: ""
