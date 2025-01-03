@@ -53,8 +53,9 @@ int main(int argc, char * argv[]) {
   nvistar::ROS2Convert::lidar_ros_config_t config;
   std::string serial_name;
   int serial_baud;
+  int timeout_count = 0;
   //sync para form launch 
-  READ_PARAM(std::string, "serialport_name", (serial_name), "/dev/ttyUSB0");
+  READ_PARAM(std::string, "serial_name", (serial_name), "/dev/ttyUSB0");
   READ_PARAM(int, "serial_baud", (serial_baud), 230400);
   READ_PARAM(std::string, "frame_id", (config.frame_id), "laser_frame"); 
   READ_PARAM(bool, "resolution_fixed", (config.resolution_fixed), false); 
@@ -97,6 +98,7 @@ int main(int argc, char * argv[]) {
     nvistar::lidar_scan_status_t status = _lidar->lidar_get_scandata(lidar_raw_scan);
     switch(status){
       case nvistar::LIDAR_SCAN_OK:{
+        timeout_count = 0;
         _convert->lidar_raw_to_ros2(lidar_raw_scan, config, lidar_ros_scan);
         try {
           scan_pub->publish(lidar_ros_scan);
@@ -106,19 +108,29 @@ int main(int argc, char * argv[]) {
         break;
       }
       case nvistar::LIDAR_SCAN_ERROR_MOTOR_LOCK: {
+        timeout_count = 0;
         RCLCPP_ERROR(node->get_logger(), "lidar motor lock!");
         break;
       }
       case nvistar::LIDAR_SCAN_ERROR_MOTOR_SHORTCIRCUIT: {
+        timeout_count = 0;
         RCLCPP_ERROR(node->get_logger(), "lidar motor short circuit!");
         break;
       }
       case nvistar::LIDAR_SCAN_ERROR_UP_NO_POINT: {
+        timeout_count = 0;
         RCLCPP_ERROR(node->get_logger(), "lidar upboard no points!");
         break;
       }
       case nvistar::LIDAR_SCAN_TIMEOUT: {
         RCLCPP_ERROR(node->get_logger(), "lidar data timeout!");
+        //reconnect 
+        timeout_count++;
+        if(timeout_count >= 10){
+          timeout_count = 0;
+          _serial->serial_reopen();
+          RCLCPP_INFO(node->get_logger(), "lidar serial reopen!\n");
+        }
         break;
       }
       default:{
